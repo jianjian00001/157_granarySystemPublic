@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.LiangcangChuruInoutDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.liangcang_churu_inout_uuid_number as liangcangChuruInoutUuidNumber
+        ,a.liangcang_churu_inout_name as liangcangChuruInoutName
+        ,a.liangcang_churu_inout_types as liangcangChuruInoutTypes
+        ,a.liangcang_churu_inout_content as liangcangChuruInoutContent
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.LiangcangChuruInoutView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+
+        FROM liangcang_churu_inout  a
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.liangcangChuruInoutUuidNumber != '' and params.liangcangChuruInoutUuidNumber != null and params.liangcangChuruInoutUuidNumber != 'null' ">
+                and a.liangcang_churu_inout_uuid_number like CONCAT('%',#{params.liangcangChuruInoutUuidNumber},'%')
+            </if>
+            <if test=" params.liangcangChuruInoutName != '' and params.liangcangChuruInoutName != null and params.liangcangChuruInoutName != 'null' ">
+                and a.liangcang_churu_inout_name like CONCAT('%',#{params.liangcangChuruInoutName},'%')
+            </if>
+            <if test="params.liangcangChuruInoutTypes != null and params.liangcangChuruInoutTypes != ''">
+                and a.liangcang_churu_inout_types = #{params.liangcangChuruInoutTypes}
+            </if>
+            <if test=" params.liangcangChuruInoutContent != '' and params.liangcangChuruInoutContent != null and params.liangcangChuruInoutContent != 'null' ">
+                and a.liangcang_churu_inout_content like CONCAT('%',#{params.liangcangChuruInoutContent},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>

@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.LiangcangChuruInoutListDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.liangcang_churu_inout_id as liangcangChuruInoutId
+        ,a.liangcang_id as liangcangId
+        ,a.liangcang_churu_inout_list_number as liangcangChuruInoutListNumber
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.LiangcangChuruInoutListView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+        ,liangcang.yonghu_id as liangcangYonghuId
+        ,liangcang.liangcang_name as liangcangName
+        ,liangcang.liangcang_uuid_number as liangcangUuidNumber
+        ,liangcang.liangcang_photo as liangcangPhoto
+        ,liangcang.liangcang_address as liangcangAddress
+        ,liangcang.liangcang_types as liangcangTypes
+        ,liangcang.liangcang_zuida_number as liangcangZuidaNumber
+        ,liangcang.liangcang_kucun_number as liangcangKucunNumber
+        ,liangcang.liangcang_wendu as liangcangWendu
+        ,liangcang.liangcang_shidu as liangcangShidu
+        ,liangcang.liangcang_hanchongliang as liangcangHanchongliang
+        ,liangcang.liangcang_shifou_types as liangcangShifouTypes
+        ,liangcang.liangcang_hanzalv as liangcangHanzalv
+        ,liangcang.liangcang_content as liangcangContent
+        ,liangcang.liangcang_delete as liangcangDelete
+        ,liangcangChuruInout.liangcang_churu_inout_uuid_number as liangcangChuruInoutUuidNumber
+        ,liangcangChuruInout.liangcang_churu_inout_name as liangcangChuruInoutName
+        ,liangcangChuruInout.liangcang_churu_inout_types as liangcangChuruInoutTypes
+        ,liangcangChuruInout.liangcang_churu_inout_content as liangcangChuruInoutContent
+
+        FROM liangcang_churu_inout_list  a
+        left JOIN liangcang liangcang ON a.liangcang_id = liangcang.id
+        left JOIN liangcang_churu_inout liangcangChuruInout ON a.liangcang_churu_inout_id = liangcangChuruInout.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.liangcangChuruInoutId != null and params.liangcangChuruInoutId != ''">
+                and (
+                    a.liangcang_churu_inout_id = #{params.liangcangChuruInoutId}
+                )
+            </if>
+            <if test="params.liangcangId != null and params.liangcangId != ''">
+                and (
+                    a.liangcang_id = #{params.liangcangId}
+                )
+            </if>
+            <if test="params.liangcangChuruInoutListNumberStart != null and params.liangcangChuruInoutListNumberStart != ''">
+                <![CDATA[  and a.liangcang_churu_inout_list_number >= #{params.liangcangChuruInoutListNumberStart}   ]]>
+            </if>
+            <if test="params.liangcangChuruInoutListNumberEnd != null and params.liangcangChuruInoutListNumberEnd != ''">
+                <![CDATA[  and a.liangcang_churu_inout_list_number <= #{params.liangcangChuruInoutListNumberEnd}   ]]>
+            </if>
+             <if test="params.liangcangChuruInoutListNumber != null and params.liangcangChuruInoutListNumber != ''">
+                and a.liangcang_churu_inout_list_number = #{params.liangcangChuruInoutListNumber}
+             </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+                <!-- 判断粮仓的id不为空 -->
+            <if test=" params.liangcangIdNotNull != '' and params.liangcangIdNotNull != null and params.liangcangIdNotNull != 'null' ">
+                and a.liangcang_id IS NOT NULL
+            </if>
+            <if test="params.yonghuId != null  and params.yonghuId != ''">
+                and liangcang.yonghu_id = #{params.yonghuId}
+            </if>
+            <if test=" params.liangcangName != '' and params.liangcangName != null and params.liangcangName != 'null' ">
+                and liangcang.liangcang_name like CONCAT('%',#{params.liangcangName},'%')
+            </if>
+            <if test=" params.liangcangUuidNumber != '' and params.liangcangUuidNumber != null and params.liangcangUuidNumber != 'null' ">
+                and liangcang.liangcang_uuid_number like CONCAT('%',#{params.liangcangUuidNumber},'%')
+            </if>
+            <if test=" params.liangcangAddress != '' and params.liangcangAddress != null and params.liangcangAddress != 'null' ">
+                and liangcang.liangcang_address like CONCAT('%',#{params.liangcangAddress},'%')
+            </if>
+            <if test="params.liangcangTypes != null  and params.liangcangTypes != ''">
+                and liangcang.liangcang_types = #{params.liangcangTypes}
+            </if>
+
+            <if test="params.liangcangZuidaNumberStart != null  and params.liangcangZuidaNumberStart != '' ">
+                <![CDATA[  and liangcang.liangcang_zuida_number >= #{params.liangcangZuidaNumberStart}   ]]>
+            </if>
+            <if test="params.liangcangZuidaNumberEnd != null  and params.liangcangZuidaNumberEnd != '' ">
+                <![CDATA[  and liangcang.liangcang_zuida_number <= #{params.liangcangZuidaNumberEnd}   ]]>
+            </if>
+            <if test="params.liangcangZuidaNumber != null  and params.liangcangZuidaNumber != '' ">
+                and liangcang.liangcang_zuida_number = #{params.liangcangZuidaNumber}
+            </if>
+            <if test="params.liangcangKucunNumberStart != null  and params.liangcangKucunNumberStart != '' ">
+                <![CDATA[  and liangcang.liangcang_kucun_number >= #{params.liangcangKucunNumberStart}   ]]>
+            </if>
+            <if test="params.liangcangKucunNumberEnd != null  and params.liangcangKucunNumberEnd != '' ">
+                <![CDATA[  and liangcang.liangcang_kucun_number <= #{params.liangcangKucunNumberEnd}   ]]>
+            </if>
+            <if test="params.liangcangKucunNumber != null  and params.liangcangKucunNumber != '' ">
+                and liangcang.liangcang_kucun_number = #{params.liangcangKucunNumber}
+            </if>
+            <if test="params.liangcangWenduStart != null ">
+                <![CDATA[  and liangcang.liangcang_wendu >= #{params.liangcangWenduStart}   ]]>
+            </if>
+            <if test="params.liangcangWenduEnd != null ">
+                <![CDATA[  and liangcang.liangcang_wendu <= #{params.liangcangWenduEnd}   ]]>
+            </if>
+            <if test="params.liangcangShiduStart != null ">
+                <![CDATA[  and liangcang.liangcang_shidu >= #{params.liangcangShiduStart}   ]]>
+            </if>
+            <if test="params.liangcangShiduEnd != null ">
+                <![CDATA[  and liangcang.liangcang_shidu <= #{params.liangcangShiduEnd}   ]]>
+            </if>
+            <if test="params.liangcangHanchongliangStart != null  and params.liangcangHanchongliangStart != '' ">
+                <![CDATA[  and liangcang.liangcang_hanchongliang >= #{params.liangcangHanchongliangStart}   ]]>
+            </if>
+            <if test="params.liangcangHanchongliangEnd != null  and params.liangcangHanchongliangEnd != '' ">
+                <![CDATA[  and liangcang.liangcang_hanchongliang <= #{params.liangcangHanchongliangEnd}   ]]>
+            </if>
+            <if test="params.liangcangHanchongliang != null  and params.liangcangHanchongliang != '' ">
+                and liangcang.liangcang_hanchongliang = #{params.liangcangHanchongliang}
+            </if>
+            <if test="params.liangcangShifouTypes != null  and params.liangcangShifouTypes != ''">
+                and liangcang.liangcang_shifou_types = #{params.liangcangShifouTypes}
+            </if>
+
+            <if test="params.liangcangHanzalvStart != null  and params.liangcangHanzalvStart != '' ">
+                <![CDATA[  and liangcang.liangcang_hanzalv >= #{params.liangcangHanzalvStart}   ]]>
+            </if>
+            <if test="params.liangcangHanzalvEnd != null  and params.liangcangHanzalvEnd != '' ">
+                <![CDATA[  and liangcang.liangcang_hanzalv <= #{params.liangcangHanzalvEnd}   ]]>
+            </if>
+            <if test="params.liangcangHanzalv != null  and params.liangcangHanzalv != '' ">
+                and liangcang.liangcang_hanzalv = #{params.liangcangHanzalv}
+            </if>
+            <if test=" params.liangcangContent != '' and params.liangcangContent != null and params.liangcangContent != 'null' ">
+                and liangcang.liangcang_content like CONCAT('%',#{params.liangcangContent},'%')
+            </if>
+            <if test="params.liangcangDeleteStart != null  and params.liangcangDeleteStart != '' ">
+                <![CDATA[  and liangcang.liangcang_delete >= #{params.liangcangDeleteStart}   ]]>
+            </if>
+            <if test="params.liangcangDeleteEnd != null  and params.liangcangDeleteEnd != '' ">
+                <![CDATA[  and liangcang.liangcang_delete <= #{params.liangcangDeleteEnd}   ]]>
+            </if>
+            <if test="params.liangcangDelete != null  and params.liangcangDelete != '' ">
+                and liangcang.liangcang_delete = #{params.liangcangDelete}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(liangcang.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(liangcang.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+                <!-- 判断出入库的id不为空 -->
+            <if test=" params.liangcangChuruInoutIdNotNull != '' and params.liangcangChuruInoutIdNotNull != null and params.liangcangChuruInoutIdNotNull != 'null' ">
+                and a.liangcang_churu_inout_id IS NOT NULL
+            </if>
+            <if test=" params.liangcangChuruInoutUuidNumber != '' and params.liangcangChuruInoutUuidNumber != null and params.liangcangChuruInoutUuidNumber != 'null' ">
+                and liangcangChuruInout.liangcang_churu_inout_uuid_number like CONCAT('%',#{params.liangcangChuruInoutUuidNumber},'%')
+            </if>
+            <if test=" params.liangcangChuruInoutName != '' and params.liangcangChuruInoutName != null and params.liangcangChuruInoutName != 'null' ">
+                and liangcangChuruInout.liangcang_churu_inout_name like CONCAT('%',#{params.liangcangChuruInoutName},'%')
+            </if>
+            <if test="params.liangcangChuruInoutTypes != null  and params.liangcangChuruInoutTypes != ''">
+                and liangcangChuruInout.liangcang_churu_inout_types = #{params.liangcangChuruInoutTypes}
+            </if>
+
+            <if test=" params.liangcangChuruInoutContent != '' and params.liangcangChuruInoutContent != null and params.liangcangChuruInoutContent != 'null' ">
+                and liangcangChuruInout.liangcang_churu_inout_content like CONCAT('%',#{params.liangcangChuruInoutContent},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(liangcangChuruInout.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(liangcangChuruInout.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>
